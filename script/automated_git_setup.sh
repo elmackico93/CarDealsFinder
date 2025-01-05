@@ -56,14 +56,7 @@ REPO_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -u "$GITHUB_USER:$GITHUB_TO
 if [ "$REPO_EXISTS" -eq 404 ]; then
     # Create a new repository if it doesn't exist
     display_message "Repository not found. Creating a new repository on GitHub..." "info"
-    REPO_CREATE=$(curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" -X POST -d "{\"name\":\"$REPO_NAME\", \"description\":\"A web app to find the best car deals online with AutoScout24 data. Supports multiple languages, real-time scraping, and filters.\"}" "https://api.github.com/user/repos")
-    
-    # Check if repository was created successfully
-    if [[ $(echo "$REPO_CREATE" | jq -r .message) == "Bad credentials" ]]; then
-        display_message "Authentication failed. Please check your GitHub token." "error"
-        exit 1
-    fi
-    
+    curl -u "$GITHUB_USER:$GITHUB_TOKEN" -X POST -d "{\"name\":\"$REPO_NAME\", \"description\":\"A web app to find the best car deals online with AutoScout24 data. Supports multiple languages, real-time scraping, and filters.\"}" "https://api.github.com/user/repos" || { display_message "Failed to create GitHub repository." "error"; exit 1; }
     display_message "Repository created successfully!" "success"
 else
     display_message "Repository already exists on GitHub." "info"
@@ -78,13 +71,9 @@ display_message "Linking to GitHub repository..." "info"
 REMOTE_ORIGIN=$(git remote get-url origin 2>/dev/null)
 if [[ $? -eq 0 ]]; then
     display_message "Remote 'origin' already exists: $REMOTE_ORIGIN" "warning"
-    read -p "Do you want to overwrite the existing remote origin? (yes/no): " OVERWRITE_REMOTE
-    if [[ "$OVERWRITE_REMOTE" == "yes" ]]; then
-        git remote set-url origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to overwrite GitHub repository link." "error"; exit 1; }
-        display_message "Remote origin updated successfully." "success"
-    else
-        display_message "Skipping remote origin setup." "info"
-    fi
+    display_message "Overwriting existing remote origin." "info"
+    git remote set-url origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to overwrite GitHub repository link." "error"; exit 1; }
+    display_message "Remote origin updated successfully." "success"
 else
     git remote add origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to link to GitHub repository." "error"; exit 1; }
     display_message "Remote origin added successfully." "success"
