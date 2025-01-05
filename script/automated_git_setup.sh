@@ -66,7 +66,7 @@ git remote add origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USE
 # 4. Push to GitHub
 # ============================================================
 display_message "Pushing to GitHub repository..." "info"
-git push -u origin master || { display_message "Failed to push to GitHub repository." "error"; exit 1; }
+git push -u origin main || { display_message "Failed to push to GitHub repository." "error"; exit 1; }
 
 # ============================================================
 # 5. Set Up Repository Settings for SEO and Collaboration
