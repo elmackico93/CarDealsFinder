@@ -56,7 +56,14 @@ REPO_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -u "$GITHUB_USER:$GITHUB_TO
 if [ "$REPO_EXISTS" -eq 404 ]; then
     # Create a new repository if it doesn't exist
     display_message "Repository not found. Creating a new repository on GitHub..." "info"
-    curl -u "$GITHUB_USER:$GITHUB_TOKEN" -X POST -d "{\"name\":\"$REPO_NAME\", \"description\":\"A web app to find the best car deals online with AutoScout24 data. Supports multiple languages, real-time scraping, and filters.\"}" "https://api.github.com/user/repos" || { display_message "Failed to create GitHub repository." "error"; exit 1; }
+    REPO_CREATE=$(curl -s -u "$GITHUB_USER:$GITHUB_TOKEN" -X POST -d "{\"name\":\"$REPO_NAME\", \"description\":\"A web app to find the best car deals online with AutoScout24 data. Supports multiple languages, real-time scraping, and filters.\"}" "https://api.github.com/user/repos")
+    
+    # Check if repository was created successfully
+    if [[ $(echo "$REPO_CREATE" | jq -r .message) == "Bad credentials" ]]; then
+        display_message "Authentication failed. Please check your GitHub token." "error"
+        exit 1
+    fi
+    
     display_message "Repository created successfully!" "success"
 else
     display_message "Repository already exists on GitHub." "info"
