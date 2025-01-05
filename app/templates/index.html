@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Deals Finder</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">🚗 Car Deals Finder</h1>
+        <p class="text-center">Find the best car deals near you!</p>
+
+        <!-- Language Selector -->
+        <div class="form-group">
+            <label for="language-select">Select Language:</label>
+            <select class="form-control" id="language-select">
+                <option value="en">English</option>
+                <option value="it">Italiano</option>
+                <option value="de">Deutsch</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
+
+        <!-- Filters -->
+        <h4>Apply Filters</h4>
+        <form id="filters-form">
+            <div class="form-row">
+                <div class="col-md-4">
+                    <label for="maxPrice">Max Price (€)</label>
+                    <input type="number" class="form-control" id="maxPrice" placeholder="Max Price">
+                </div>
+                <div class="col-md-4">
+                    <label for="minYear">Min Year</label>
+                    <input type="number" class="form-control" id="minYear" placeholder="Min Year">
+                </div>
+                <div class="col-md-4">
+                    <label for="fuelType">Fuel Type</label>
+                    <select class="form-control" id="fuelType">
+                        <option value="all">All</option>
+                        <option value="petrol">Petrol</option>
+                        <option value="diesel">Diesel</option>
+                        <option value="electric">Electric</option>
+                        <option value="hybrid">Hybrid</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary mt-3" onclick="fetchDeals()">Search</button>
+        </form>
+
+        <!-- Car Deals -->
+        <h3 class="mt-4">Car Deals</h3>
+        <div id="deals-container"></div>
+        <div id="loadingMessage" class="mt-3"></div>
+        <div id="no-deals-message" class="text-center text-warning mt-3" style="display: none;">No car deals found matching your filters.</div>
+    </div>
+
+    <script>
+        // Fetch car deals based on filters
+        function fetchDeals() {
+            const maxPrice = document.getElementById("maxPrice").value;
+            const minYear = document.getElementById("minYear").value;
+            const fuelType = document.getElementById("fuelType").value;
+            const language = document.getElementById("language-select").value;
+            const url = `/api/recommendations?maxPrice=${maxPrice}&minYear=${minYear}&fuelType=${fuelType}`;
+
+            document.getElementById("loadingMessage").textContent = "Loading car deals...";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayDeals(data);
+                    document.getElementById("loadingMessage").textContent = "";
+                    document.getElementById("no-deals-message").style.display = data.length ? 'none' : 'block';
+                })
+                .catch(error => {
+                    console.error("Error fetching car deals:", error);
+                    document.getElementById("loadingMessage").textContent = "";
+                    document.getElementById("no-deals-message").style.display = 'block';
+                });
+        }
+
+        // Display fetched car deals
+        function displayDeals(cars) {
+            const dealsContainer = document.getElementById("deals-container");
+            dealsContainer.innerHTML = "";
+
+            cars.forEach(car => {
+                const carElement = document.createElement("div");
+                carElement.classList.add("card", "mt-3");
+                carElement.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${car.title}</h5>
+                        <p class="card-text"><strong>Price:</strong> ${car.price}</p>
+                        <p class="card-text"><strong>Mileage:</strong> ${car.mileage}</p>
+                        <p class="card-text"><strong>Year:</strong> ${car.year}</p>
+                    </div>
+                `;
+                dealsContainer.appendChild(carElement);
+            });
+        }
+
+        // Fetch initial deals on page load
+        window.onload = fetchDeals;
+    </script>
+</body>
+</html>
