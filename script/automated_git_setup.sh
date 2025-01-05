@@ -39,7 +39,13 @@ echo ""
 display_message "Initializing local Git repository..." "info"
 git init || { display_message "Failed to initialize Git repository." "error"; exit 1; }
 git add . || { display_message "Failed to add files to Git." "error"; exit 1; }
-git commit -m "Initial commit of Car Deals Finder" || { display_message "Failed to commit changes." "error"; exit 1; }
+
+# Check if there are any changes to commit
+if git diff --cached --quiet; then
+    display_message "No changes to commit. Skipping commit." "info"
+else
+    git commit -m "Initial commit of Car Deals Finder" || { display_message "Failed to commit changes." "error"; exit 1; }
+fi
 
 # ============================================================
 # 2. Check if GitHub Repository exists
