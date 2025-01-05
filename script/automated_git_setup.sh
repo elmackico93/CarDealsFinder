@@ -29,8 +29,8 @@ display_message() {
 read -p "Enter your GitHub username: " GITHUB_USER
 read -p "Enter the name of your repository (e.g., CarDealsFinder): " REPO_NAME
 
-# Prompt for GitHub credentials
-read -sp "Enter your GitHub personal access token or password: " GITHUB_TOKEN
+# Prompt for GitHub credentials (Personal Access Token)
+read -sp "Enter your GitHub personal access token: " GITHUB_TOKEN
 echo ""
 
 # ============================================================
@@ -45,7 +45,7 @@ git commit -m "Initial commit of Car Deals Finder" || { display_message "Failed 
 # 2. Check if GitHub Repository exists
 # ============================================================
 display_message "Checking if GitHub repository exists..." "info"
-REPO_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/$GITHUB_USER/$REPO_NAME")
+REPO_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -u "$GITHUB_USER:$GITHUB_TOKEN" "https://api.github.com/repos/$GITHUB_USER/$REPO_NAME")
 
 if [ "$REPO_EXISTS" -eq 404 ]; then
     # Create a new repository if it doesn't exist
@@ -60,13 +60,28 @@ fi
 # 3. Link to GitHub Repository
 # ============================================================
 display_message "Linking to GitHub repository..." "info"
-git remote add origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to link to GitHub repository." "error"; exit 1; }
+
+# Check if the remote origin already exists
+REMOTE_ORIGIN=$(git remote get-url origin 2>/dev/null)
+if [[ $? -eq 0 ]]; then
+    display_message "Remote 'origin' already exists: $REMOTE_ORIGIN" "warning"
+    read -p "Do you want to overwrite the existing remote origin? (yes/no): " OVERWRITE_REMOTE
+    if [[ "$OVERWRITE_REMOTE" == "yes" ]]; then
+        git remote set-url origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to overwrite GitHub repository link." "error"; exit 1; }
+        display_message "Remote origin updated successfully." "success"
+    else
+        display_message "Skipping remote origin setup." "info"
+    fi
+else
+    git remote add origin "https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$REPO_NAME.git" || { display_message "Failed to link to GitHub repository." "error"; exit 1; }
+    display_message "Remote origin added successfully." "success"
+fi
 
 # ============================================================
 # 4. Push to GitHub
 # ============================================================
 display_message "Pushing to GitHub repository..." "info"
-git push -u origin master || { display_message "Failed to push to GitHub repository." "error"; exit 1; }
+git push -u origin main || { display_message "Failed to push to GitHub repository." "error"; exit 1; }
 
 # ============================================================
 # 5. Set Up Repository Settings for SEO and Collaboration
