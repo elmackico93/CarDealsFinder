@@ -66,14 +66,15 @@ handle_error() {
     exit 1
 }
 
-# Check for root permissions
+# Ensure script is run as root when necessary
 ensure_root() {
-    if [[ "$USER" != "root" ]]; then
+    if [[ "$USER" != "root" && "$1" == "required" ]]; then
         display_message "This script must be run as root. Please use sudo." "error"
         exit 1
     fi
 }
 
+# Secure permissions on the app directory
 secure_permissions() {
     chmod -R 750 "$APP_DIR" || handle_error "Failed to set secure permissions."
     chown -R "$USER:$USER" "$APP_DIR" || handle_error "Failed to set ownership for $APP_DIR."
@@ -185,7 +186,7 @@ final_steps() {
 
 # Main execution
 main() {
-    ensure_root
+    ensure_root "required"
     load_translations
     setup_configuration
     install_dependencies

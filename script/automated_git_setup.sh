@@ -104,7 +104,7 @@ git push --tags || { display_message "Failed to push tags to GitHub." "error"; e
 # 7. Add .gitignore for Common Files
 # ============================================================
 display_message "Adding .gitignore..." "info"
-echo -e "*.pyc\n__pycache__\n.venv/" > .gitignore
+echo -e "*.pyc\n__pycache__\n.venv/\n.DS_Store" > .gitignore
 git add .gitignore
 git commit -m "Added .gitignore to exclude unwanted files"
 git push
