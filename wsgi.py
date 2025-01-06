@@ -1,7 +1,8 @@
 from app import create_app
 
-# Initialize the Flask app
+# Create and configure the Flask app
 app = create_app()
 
 if __name__ == "__main__":
-    app.run()
+    # Use the default port for deployment compatibility
+    app.run(host="0.0.0.0", port=8000)

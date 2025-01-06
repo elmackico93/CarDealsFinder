@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Deals Finder</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">🚗 Car Deals Finder</h1>
-        <p class="text-center">Find the best car deals near you!</p>
+    <div class="container mt-5" role="main">
+        <h1 class="text-center" aria-label="Car Deals Finder">🚗 Car Deals Finder</h1>
+        <p class="text-center" aria-label="Find the best car deals near you">Find the best car deals near you!</p>
 
         <!-- Language Selector -->
         <div class="form-group">
-            <label for="language-select">Select Language:</label>
-            <select class="form-control" id="language-select">
+            <label for="language-select" class="sr-only">Select Language:</label>
+            <select class="form-control" id="language-select" aria-label="Language Selector">
                 <option value="en">English</option>
                 <option value="it">Italiano</option>
                 <option value="de">Deutsch</option>
@@ -26,19 +27,19 @@
 
         <!-- Filters -->
         <h4>Apply Filters</h4>
-        <form id="filters-form">
+        <form id="filters-form" aria-label="Filter Form">
             <div class="form-row">
                 <div class="col-md-4">
-                    <label for="maxPrice">Max Price (€)</label>
-                    <input type="number" class="form-control" id="maxPrice" placeholder="Max Price">
+                    <label for="maxPrice" class="sr-only">Max Price (€)</label>
+                    <input type="number" class="form-control" id="maxPrice" placeholder="Max Price" aria-label="Max Price">
                 </div>
                 <div class="col-md-4">
-                    <label for="minYear">Min Year</label>
-                    <input type="number" class="form-control" id="minYear" placeholder="Min Year">
+                    <label for="minYear" class="sr-only">Min Year</label>
+                    <input type="number" class="form-control" id="minYear" placeholder="Min Year" aria-label="Min Year">
                 </div>
                 <div class="col-md-4">
-                    <label for="fuelType">Fuel Type</label>
-                    <select class="form-control" id="fuelType">
+                    <label for="fuelType" class="sr-only">Fuel Type</label>
+                    <select class="form-control" id="fuelType" aria-label="Fuel Type">
                         <option value="all">All</option>
                         <option value="petrol">Petrol</option>
                         <option value="diesel">Diesel</option>
@@ -47,25 +48,23 @@
                     </select>
                 </div>
             </div>
-            <button type="button" class="btn btn-primary mt-3" onclick="fetchDeals()">Search</button>
+            <button type="button" class="btn btn-primary mt-3" onclick="fetchDeals()" aria-label="Search Button">Search</button>
         </form>
 
         <!-- Car Deals -->
-        <h3 class="mt-4">Car Deals</h3>
-        <div id="deals-container"></div>
-        <div id="loadingMessage" class="mt-3"></div>
+        <h3 class="mt-4" aria-label="Car Deals">Car Deals</h3>
+        <div id="deals-container" role="region" aria-live="polite"></div>
+        <div id="loadingMessage" class="mt-3" aria-live="polite"></div>
         <div id="no-deals-message" class="text-center text-warning mt-3" style="display: none;">No car deals found matching your filters.</div>
     </div>
 
     <script>
-        // Fetch car deals based on filters
         function fetchDeals() {
             const maxPrice = document.getElementById("maxPrice").value;
             const minYear = document.getElementById("minYear").value;
             const fuelType = document.getElementById("fuelType").value;
-            const language = document.getElementById("language-select").value;
-            const url = `/api/recommendations?maxPrice=${maxPrice}&minYear=${minYear}&fuelType=${fuelType}`;
 
+            const url = `/api/recommendations?maxPrice=${maxPrice}&minYear=${minYear}&fuelType=${fuelType}`;
             document.getElementById("loadingMessage").textContent = "Loading car deals...";
 
             fetch(url)
@@ -82,7 +81,6 @@
                 });
         }
 
-        // Display fetched car deals
         function displayDeals(cars) {
             const dealsContainer = document.getElementById("deals-container");
             dealsContainer.innerHTML = "";
@@ -102,7 +100,6 @@
             });
         }
 
-        // Fetch initial deals on page load
         window.onload = fetchDeals;
     </script>
 </body>

@@ -7,3 +7,4 @@ Flask-Limiter==2.7.0
 Flask-Babel==2.0.0
 pyshortcuts==1.0.0
 certbot==1.22.0
+Flask-SQLAlchemy==2.5.1
