@@ -31,7 +31,7 @@ Before installation, make sure you have the following:
 Clone the repository and navigate into the project directory:
 
 ```bash
-git clone https://github.com/yourusername/CarDealsFinder.git
+git clone https://github.com/elmackico93/CarDealsFinder.git
 cd CarDealsFinder
 
 2. Run the installer script
